@@ -717,6 +717,51 @@
     @media (prefers-reduced-motion: reduce){
       .modalOverlay{ backdrop-filter:none; }
     }
+
+    /* === Instagram preview interativo === */
+.igPreviewWrap{
+  width: min(640px, 88%);
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.18);
+  box-shadow: 0 22px 70px rgba(0,0,0,.55);
+  position: relative;
+}
+
+.igPreviewImg{
+  width: 100%;
+  height: auto;
+  display: block;
+  transform: translateZ(0);
+}
+
+.igHint{
+  position:absolute;
+  left:12px;
+  bottom:12px;
+  padding:6px 10px;
+  border-radius:999px;
+  background: rgba(0,0,0,.55);
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(242,243,247,.92);
+  font-size:12px;
+  backdrop-filter: blur(10px);
+}
+
+/* hotspots (opcional) */
+.igHotspot{
+  position:absolute;
+  border-radius: 12px;
+  background: rgba(106,92,255,.0);
+  border: 1px solid rgba(106,92,255,.0);
+  cursor: pointer;
+}
+.igHotspot:hover{
+  background: rgba(106,92,255,.10);
+  border-color: rgba(106,92,255,.30);
+}
+
   </style>
 </head>
 
@@ -1002,45 +1047,44 @@
           <div class="card portItem reveal" style="grid-column: span 6;">
             <div class="pill">Instagram</div>
 
-            <a class="portMedia"
-               data-platform="instagram"
-               href="https://instagram.com/atelier_studios_"
-               target="_blank" rel="noopener"
-               aria-label="Abrir Instagram do Atelier Studios">
+          <a class="portMedia"
+   data-platform="instagram"
+   href="https://instagram.com/atelier_studios_"
+   target="_blank" rel="noopener">
 
-              <div style="position:absolute; inset:0; opacity:.18; pointer-events:none;
-                background:
-                  radial-gradient(280px 220px at 30% 35%, rgba(255,204,102,.40), transparent 60%),
-                  radial-gradient(240px 210px at 70% 70%, rgba(183,108,255,.35), transparent 65%);
-              "></div>
+  <div style="position:absolute; inset:0; opacity:.18; pointer-events:none;
+    background:
+      radial-gradient(280px 220px at 30% 35%, rgba(255,204,102,.40), transparent 60%),
+      radial-gradient(240px 210px at 70% 70%, rgba(183,108,255,.35), transparent 65%);
+  "></div>
 
-              <div style="display:flex; flex-direction:column; align-items:center; gap:12px; text-align:center; padding:16px;">
-                <div style="
-                  width:86px; height:86px; border-radius:24px;
-                  display:grid; place-items:center;
-                  border:1px solid rgba(255,255,255,.16);
-                  background: rgba(0,0,0,.18);
-                  box-shadow: 0 18px 60px rgba(0,0,0,.40);
-                ">
-                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" style="color: var(--text);">
-                    <path d="M7.5 2.5h9A5 5 0 0 1 21.5 7.5v9a5 5 0 0 1-5 5h-9a5 5 0 0 1-5-5v-9a5 5 0 0 1 5-5Z" stroke="currentColor" stroke-width="1.7"/>
-                    <path d="M12 16.2a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Z" stroke="currentColor" stroke-width="1.7"/>
-                    <path d="M17.4 6.6h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                  </svg>
-                </div>
+  <div class="igPreviewWrap" aria-label="Prévia do Instagram">
+    <img class="igPreviewImg" src="instagram-preview.png" alt="Prévia do perfil Instagram @atelier_studios_" loading="lazy" />
+    <div class="igHint">Toque para abrir a prévia</div>
 
-                <b style="font-size:16px;">@atelier_studios_</b>
-                <span style="color:var(--muted); font-size:13px;">Perfil no Instagram</span>
+    <!-- HOTSPOTS (opcional) - áreas clicáveis por cima do print -->
+    <!-- Ajuste as posições se seu print tiver tamanho diferente -->
+    <button class="igHotspot"
+      type="button"
+      data-ig-action="profile"
+      aria-label="Abrir perfil"
+      style="left:10%; top:14%; width:80%; height:46%;"></button>
 
-                <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:8px;">
-                  <span class="tag">Artes & thumbs</span>
-                  <span class="tag">Identidade</span>
-                  <span class="tag">Consistência</span>
-                </div>
-              </div>
+    <button class="igHotspot"
+      type="button"
+      data-ig-action="dm"
+      aria-label="Enviar mensagem"
+      style="left:56%; top:64%; width:34%; height:11%;"></button>
 
-              <span class="playBadge">▶ Abrir Instagram</span>
-            </a>
+    <button class="igHotspot"
+      type="button"
+      data-ig-action="profile"
+      aria-label="Seguindo"
+      style="left:10%; top:64%; width:42%; height:11%;"></button>
+  </div>
+
+</a>
+
 
             <div class="portActions">
               <a class="btn small" href="https://instagram.com/atelier_studios_" target="_blank" rel="noopener">Ver perfil</a>
@@ -1597,46 +1641,43 @@
           return;
         }
 
-        if(platform === "instagram"){
-          openModal("Instagram • @atelier_studios_", `
-            <div style="border:1px solid rgba(255,255,255,.10); border-radius:16px; padding:16px; background:rgba(0,0,0,.18);">
-              <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-                <div style="
-                  width:64px; height:64px; border-radius:18px;
-                  display:grid; place-items:center;
-                  border:1px solid rgba(255,255,255,.14);
-                  background: linear-gradient(135deg, rgba(255,204,102,.20), rgba(183,108,255,.18), rgba(106,92,255,.18));
-                  box-shadow: 0 18px 60px rgba(0,0,0,.45);
-                ">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="color: var(--text); opacity:.95;">
-                    <path d="M7.5 2.5h9A5 5 0 0 1 21.5 7.5v9a5 5 0 0 1-5 5h-9a5 5 0 0 1-5-5v-9a5 5 0 0 1 5-5Z" stroke="currentColor" stroke-width="1.7"/>
-                    <path d="M12 16.2a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Z" stroke="currentColor" stroke-width="1.7"/>
-                    <path d="M17.4 6.6h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                  </svg>
-                </div>
+if(platform === "instagram"){
+  openModal("Instagram • @atelier_studios_", `
+    <div style="display:grid; gap:14px;">
+      <div class="igPreviewWrap" style="width:100%; border-radius:18px;">
+        <img class="igPreviewImg" src="instagram-preview.png" alt="Prévia do Instagram @atelier_studios_" />
+      </div>
 
-                <div>
-                  <b style="display:block; font-size:16px;">@atelier_studios_</b>
-                  <span style="display:block; color:var(--muted); font-size:13px; margin-top:4px;">
-                    Portfólio e novidades no Instagram
-                  </span>
-                </div>
-              </div>
+      <div style="color:var(--muted); font-size:13px;">
+        Prévia interna (o Instagram bloqueia embed do perfil). Clique abaixo pra abrir o perfil real.
+      </div>
 
-              <div style="margin-top:14px; color:var(--muted); font-size:13px;">
-                (O Instagram costuma bloquear embed do perfil. Clique em “Abrir no Instagram” pra ver tudo.)
-              </div>
-            </div>
+      <div class="modalActions">
+        <a class="btn primary" href="https://instagram.com/atelier_studios_" target="_blank" rel="noopener">Abrir no Instagram</a>
+        <a class="btn" href="https://instagram.com/atelier_studios_/dm" target="_blank" rel="noopener">Enviar mensagem</a>
+        <a class="btn" href="#contato" onclick="closeModal()">Pedir orçamento</a>
+      </div>
+    </div>
+  `);
+  return;
+}
 
-            <div class="modalActions">
-              <a class="btn primary" href="https://instagram.com/atelier_studios_" target="_blank" rel="noopener">Abrir no Instagram</a>
-              <a class="btn" href="#contato" onclick="closeModal()">Pedir orçamento</a>
-            </div>
-          `);
-          return;
-        }
-      });
-    });
+        // Hotspots do print do Instagram (perfil/DM)
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-ig-action]");
+  if(!btn) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const action = btn.getAttribute("data-ig-action");
+  if(action === "dm"){
+    window.open("https://instagram.com/atelier_studios_/dm", "_blank", "noopener");
+    return;
+  }
+  window.open("https://instagram.com/atelier_studios_", "_blank", "noopener");
+});
+
 
     // ===== Swipe down to close (mobile) =====
     (() => {
@@ -1679,3 +1720,4 @@
   </script>
 </body>
 </html>
+
