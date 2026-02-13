@@ -658,6 +658,111 @@
   }
 }
 
+    /* ===== PORTFÓLIO: TÍTULO GLOW + BOTÃO GRADIENTE NO HOVER ===== */
+
+/* Título e subtítulo “acendem” quando passa o mouse no card */
+.portItem:hover .portMedia b{
+  text-shadow:
+    0 0 14px rgba(106,92,255,.35),
+    0 0 24px rgba(183,108,255,.22);
+}
+
+.portItem:hover .portMedia span{
+  color: rgba(242,243,247,.92);
+}
+
+/* Botões do card: o primeiro vira “principal” com gradiente no hover */
+.portActions .btn.small{
+  transition: transform .12s ease, background .12s ease, border-color .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+
+.portItem:hover .portActions .btn.small:first-child{
+  border: none;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  box-shadow: 0 14px 44px rgba(106,92,255,.26);
+  filter: brightness(1.02);
+}
+
+.portItem:hover .portActions .btn.small:first-child:hover{
+  transform: translateY(-1px) scale(1.01);
+}
+
+/* ===== MODAL (overlay) ===== */
+.modalOverlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.70);
+  backdrop-filter: blur(10px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 18px;
+}
+.modalOverlay.open{ display:flex; }
+
+.modalBox{
+  width: min(980px, 100%);
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.20));
+  box-shadow: 0 30px 120px rgba(0,0,0,.65);
+  overflow: hidden;
+}
+
+.modalTop{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.modalTop b{ font-size:14px; letter-spacing:.02em; }
+.modalClose{
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.04);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 8px 10px;
+  cursor:pointer;
+}
+.modalClose:hover{ background: rgba(255,255,255,.06); }
+
+.modalBody{
+  padding: 16px;
+}
+
+.modalFrame{
+  width:100%;
+  height: 520px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 16px;
+  overflow:hidden;
+  background: rgba(0,0,0,.18);
+}
+
+.modalFrame iframe{
+  width:100%;
+  height:100%;
+  border:0;
+  display:block;
+}
+
+.modalActions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top: 14px;
+}
+
+/* Acessibilidade: reduz movimento */
+@media (prefers-reduced-motion: reduce){
+  .modalOverlay{ backdrop-filter:none; }
+}
+
+
   </style>
 </head>
 <body>
@@ -897,9 +1002,11 @@
       <div class="card portItem reveal" style="grid-column: span 6;">
         <div class="pill">YouTube</div>
 
-        <a class="portMedia"
-           href="https://www.youtube.com/channel/UCBFPFsLmBOvtn_5SqGkw3mA"
-           target="_blank" rel="noopener">
+       <a class="portMedia"
+   data-platform="youtube"
+   href="https://www.youtube.com/channel/UCBFPFsLmBOvtn_5SqGkw3mA"
+   target="_blank" rel="noopener">
+
 
           <div style="position:absolute; inset:0; opacity:.16; pointer-events:none;
             background: radial-gradient(260px 200px at 30% 35%, rgba(255,0,0,.45), transparent 60%);">
@@ -936,9 +1043,11 @@
       <div class="card portItem reveal" style="grid-column: span 6;">
         <div class="pill">Instagram</div>
 
-        <a class="portMedia"
-           href="https://instagram.com/atelier_studios_"
-           target="_blank" rel="noopener">
+       <a class="portMedia"
+   data-platform="instagram"
+   href="https://instagram.com/atelier_studios_"
+   target="_blank" rel="noopener">
+
 
           <div style="position:absolute; inset:0; opacity:.18; pointer-events:none;
             background:
@@ -1225,6 +1334,21 @@
     </button>
   </div>
 
+  <!-- MODAL (preview sem sair do site) -->
+<div class="modalOverlay" id="modalOverlay" aria-hidden="true">
+  <div class="modalBox" role="dialog" aria-modal="true" aria-label="Prévia do portfólio">
+    <div class="modalTop">
+      <b id="modalTitle">Prévia</b>
+      <button class="modalClose" id="modalCloseBtn" type="button">✕ Fechar</button>
+    </div>
+
+    <div class="modalBody" id="modalBody">
+      <!-- preenchido via JS -->
+    </div>
+  </div>
+</div>
+
+
   <script>
     // ====== CONFIGURE HERE ======
     // WhatsApp Atelier Studios: +55 11 95875-4234
@@ -1370,9 +1494,116 @@
     } else {
       revealEls.forEach(el => el.classList.add("show"));
     }
+
+    // ===== MODAL PORTFÓLIO (sem sair do site) =====
+const YT_CHANNEL_ID = "UCBFPFsLmBOvtn_5SqGkw3mA";
+
+const modalOverlay = document.getElementById("modalOverlay");
+const modalCloseBtn = document.getElementById("modalCloseBtn");
+const modalTitle = document.getElementById("modalTitle");
+const modalBody = document.getElementById("modalBody");
+
+function openModal(title, bodyHtml){
+  modalTitle.textContent = title;
+  modalBody.innerHTML = bodyHtml;
+  modalOverlay.classList.add("open");
+  modalOverlay.setAttribute("aria-hidden", "false");
+}
+
+function closeModal(){
+  modalOverlay.classList.remove("open");
+  modalOverlay.setAttribute("aria-hidden", "true");
+  modalBody.innerHTML = "";
+}
+
+modalCloseBtn.addEventListener("click", closeModal);
+
+// fecha clicando fora da caixa
+modalOverlay.addEventListener("click", (e) => {
+  const box = modalOverlay.querySelector(".modalBox");
+  if(!box.contains(e.target)) closeModal();
+});
+
+// fecha no ESC
+document.addEventListener("keydown", (e) => {
+  if(e.key === "Escape" && modalOverlay.classList.contains("open")) closeModal();
+});
+
+// Intercepta clique nos cards do portfólio
+document.querySelectorAll('.portMedia[data-platform]').forEach((a) => {
+  a.addEventListener("click", (e) => {
+    e.preventDefault(); // não abre em aba nova, abre modal
+    const platform = a.getAttribute("data-platform");
+
+    if(platform === "youtube"){
+      const uploadsPlaylist = "UU" + YT_CHANNEL_ID.slice(2);
+      const iframeSrc = `https://www.youtube-nocookie.com/embed/videoseries?list=${uploadsPlaylist}`;
+
+      openModal("YouTube • Atelier Studios", `
+        <div class="modalFrame">
+          <iframe
+            title="Uploads do canal no YouTube"
+            src="${iframeSrc}"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+            referrerpolicy="strict-origin-when-cross-origin"
+          ></iframe>
+        </div>
+
+        <div class="modalActions">
+          <a class="btn primary" href="https://www.youtube.com/channel/${YT_CHANNEL_ID}" target="_blank" rel="noopener">Abrir no YouTube</a>
+          <a class="btn" href="#contato" onclick="closeModal()">Pedir orçamento</a>
+        </div>
+      `);
+      return;
+    }
+
+    if(platform === "instagram"){
+      // Instagram costuma bloquear iframe de perfil. Preview bonito + botão.
+      openModal("Instagram • @atelier_studios_", `
+        <div style="border:1px solid rgba(255,255,255,.10); border-radius:16px; padding:16px; background:rgba(0,0,0,.18);">
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <div style="
+              width:64px; height:64px; border-radius:18px;
+              display:grid; place-items:center;
+              border:1px solid rgba(255,255,255,.14);
+              background: linear-gradient(135deg, rgba(255,204,102,.20), rgba(183,108,255,.18), rgba(106,92,255,.18));
+              box-shadow: 0 18px 60px rgba(0,0,0,.45);
+            ">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="color: var(--text); opacity:.95;">
+                <path d="M7.5 2.5h9A5 5 0 0 1 21.5 7.5v9a5 5 0 0 1-5 5h-9a5 5 0 0 1-5-5v-9a5 5 0 0 1 5-5Z" stroke="currentColor" stroke-width="1.7"/>
+                <path d="M12 16.2a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Z" stroke="currentColor" stroke-width="1.7"/>
+                <path d="M17.4 6.6h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+            </div>
+
+            <div>
+              <b style="display:block; font-size:16px;">@atelier_studios_</b>
+              <span style="display:block; color:var(--muted); font-size:13px; margin-top:4px;">
+                Portfólio e novidades no Instagram
+              </span>
+            </div>
+          </div>
+
+          <div style="margin-top:14px; color:var(--muted); font-size:13px;">
+            (Prévia interna: o Instagram costuma bloquear embed do perfil. Clique em “Abrir no Instagram” pra ver tudo.)
+          </div>
+        </div>
+
+        <div class="modalActions">
+          <a class="btn primary" href="https://instagram.com/atelier_studios_" target="_blank" rel="noopener">Abrir no Instagram</a>
+          <a class="btn" href="#contato" onclick="closeModal()">Pedir orçamento</a>
+        </div>
+      `);
+      return;
+    }
+  });
+});
+
   </script>
 </body>
 </html>
+
 
 
 
