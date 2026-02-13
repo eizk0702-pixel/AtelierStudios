@@ -568,6 +568,96 @@
       .chev{transition:none}
       .btn{transition:none}
     }
+    /* ===== PORTFÓLIO: HOVER PREMIUM (zoom + brilho + glow no ícone) ===== */
+
+/* Faz o card “subir” e ficar mais vivo */
+.portItem{
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+  will-change: transform;
+}
+
+.portItem:hover{
+  transform: translateY(-3px);
+  border-color: rgba(255,255,255,.16);
+  box-shadow: 0 22px 80px rgba(0,0,0,.55);
+}
+
+/* Deixa a área clicável com leve zoom e brilho */
+.portMedia{
+  transition: transform .18s ease, filter .18s ease;
+  position: relative;
+}
+
+.portItem:hover .portMedia{
+  transform: scale(1.015);
+  filter: brightness(1.06) saturate(1.05);
+}
+
+/* Glow suave na moldura do “ícone” (a caixinha que envolve o SVG) */
+.portMedia > div{
+  transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease;
+}
+
+/* Como você usa um div wrapper no centro, a gente mira nele */
+.portItem:hover .portMedia div[style*="width:86px"]{
+  box-shadow:
+    0 22px 70px rgba(0,0,0,.55),
+    0 0 0 1px rgba(255,255,255,.12),
+    0 0 40px rgba(106,92,255,.22);
+  border-color: rgba(255,255,255,.22);
+  transform: translateY(-1px);
+}
+
+/* Glow no ícone (SVG) e leve “acender” */
+.portMedia svg{
+  transition: filter .18s ease, transform .18s ease, opacity .18s ease;
+  opacity: .92;
+}
+
+.portItem:hover .portMedia svg{
+  opacity: 1;
+  transform: scale(1.04);
+  filter: drop-shadow(0 0 10px rgba(183,108,255,.35))
+          drop-shadow(0 0 18px rgba(106,92,255,.20));
+}
+
+/* “Shine” passando por cima (aquele reflexo chique) */
+.portMedia::after{
+  content:"";
+  position:absolute;
+  inset:-20% -40%;
+  background: linear-gradient(120deg,
+    transparent 35%,
+    rgba(255,255,255,.10) 45%,
+    rgba(255,255,255,.06) 55%,
+    transparent 65%
+  );
+  transform: translateX(-35%) rotate(8deg);
+  opacity: 0;
+  transition: opacity .18s ease, transform .45s ease;
+  pointer-events:none;
+}
+
+.portItem:hover .portMedia::after{
+  opacity: .9;
+  transform: translateX(35%) rotate(8deg);
+}
+
+/* Botões do portfólio ficarem mais “clicáveis” no hover do card */
+.portItem:hover .btn.small{
+  border-color: rgba(255,255,255,.16);
+  background: rgba(255,255,255,.06);
+}
+
+/* Acessibilidade: sem movimento pra quem pediu */
+@media (prefers-reduced-motion: reduce){
+  .portItem, .portMedia, .portMedia::after, .portMedia svg{
+    transition:none !important;
+    transform:none !important;
+    filter:none !important;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -1283,5 +1373,6 @@
   </script>
 </body>
 </html>
+
 
 
