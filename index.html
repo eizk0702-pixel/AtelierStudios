@@ -762,6 +762,21 @@
   .modalOverlay{ backdrop-filter:none; }
 }
 
+    /* “handle” de arrastar no modal (visual app-like) */
+.modalTop::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:8px;
+  transform: translateX(-50%);
+  width: 46px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.14);
+  opacity: .75;
+}
+.modalTop{ position:relative; padding-top:22px; }
+
 
   </style>
 </head>
@@ -1027,8 +1042,14 @@
             </div>
 
             <b>Atelier Studios</b>
-            <span style="color:var(--muted); font-size:13px;">Canal no YouTube</span>
-          </div>
+<span style="color:var(--muted); font-size:13px;">Canal no YouTube</span>
+
+<div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:10px;">
+  <span class="tag">+120 entregas</span>
+  <span class="tag">24–72h</span>
+  <span class="tag">Reels/Shorts</span>
+</div>
+
 
           <span class="playBadge">▶ Abrir canal</span>
         </a>
@@ -1072,8 +1093,14 @@
             </div>
 
             <b>@atelier_studios_</b>
-            <span style="color:var(--muted); font-size:13px;">Perfil no Instagram</span>
-          </div>
+<span style="color:var(--muted); font-size:13px;">Perfil no Instagram</span>
+
+<div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:10px;">
+  <span class="tag">Artes & thumbs</span>
+  <span class="tag">Identidade</span>
+  <span class="tag">Consistência</span>
+</div>
+
 
           <span class="playBadge">▶ Abrir Instagram</span>
         </a>
@@ -1495,6 +1522,76 @@
       revealEls.forEach(el => el.classList.add("show"));
     }
 
+    async function getLatestYouTubeVideoId(channelId){
+  const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+  const proxied = `https://r.jina.ai/${feedUrl.replace(/^https?:\/\//,'https://')}`;
+
+  const res = await fetch(proxied, { cache: "no-store" });
+  if(!res.ok) throw new Error("feed http " + res.status);
+
+  const text = await res.text();
+  const xml = new DOMParser().parseFromString(text, "application/xml");
+  if(xml.getElementsByTagName("parsererror").length) throw new Error("parsererror");
+
+  const entry = xml.getElementsByTagName("entry")[0];
+  if(!entry) throw new Error("no entry");
+
+  const vidNode =
+    entry.getElementsByTagName("yt:videoId")[0] ||
+    entry.getElementsByTagNameNS("*","videoId")[0];
+
+  const videoId = vidNode?.textContent?.trim();
+  if(!videoId) throw new Error("no videoId");
+
+  return videoId;
+}
+
+function youtubeEmbedHtmlLatest({ channelId, videoId }){
+  const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+  const iframeSrc = `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`;
+
+  return `
+    <div class="modalFrame">
+      <iframe
+        title="Último vídeo do canal"
+        src="${iframeSrc}"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+        referrerpolicy="strict-origin-when-cross-origin"
+      ></iframe>
+    </div>
+
+    <div class="modalActions">
+      <a class="btn primary" href="${videoUrl}" target="_blank" rel="noopener">Abrir no YouTube</a>
+      <a class="btn" href="https://www.youtube.com/channel/${channelId}" target="_blank" rel="noopener">Ver canal</a>
+      <a class="btn" href="#contato" onclick="closeModal()">Pedir orçamento</a>
+    </div>
+  `;
+}
+
+function youtubeEmbedHtmlFallbackPlaylist({ channelId }){
+  const uploadsPlaylist = "UU" + channelId.slice(2);
+  const iframeSrc = `https://www.youtube-nocookie.com/embed/videoseries?list=${uploadsPlaylist}`;
+
+  return `
+    <div class="modalFrame">
+      <iframe
+        title="Uploads do canal no YouTube"
+        src="${iframeSrc}"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+        referrerpolicy="strict-origin-when-cross-origin"
+      ></iframe>
+    </div>
+
+    <div class="modalActions">
+      <a class="btn primary" href="https://www.youtube.com/channel/${channelId}" target="_blank" rel="noopener">Abrir no YouTube</a>
+      <a class="btn" href="#contato" onclick="closeModal()">Pedir orçamento</a>
+    </div>
+  `;
+}
+
+    
     // ===== MODAL PORTFÓLIO (sem sair do site) =====
 const YT_CHANNEL_ID = "UCBFPFsLmBOvtn_5SqGkw3mA";
 
@@ -1536,8 +1633,22 @@ document.querySelectorAll('.portMedia[data-platform]').forEach((a) => {
     const platform = a.getAttribute("data-platform");
 
     if(platform === "youtube"){
-      const uploadsPlaylist = "UU" + YT_CHANNEL_ID.slice(2);
-      const iframeSrc = `https://www.youtube-nocookie.com/embed/videoseries?list=${uploadsPlaylist}`;
+  openModal("YouTube • Atelier Studios", `
+    <div style="color:var(--muted); font-size:13px; margin-bottom:10px;">
+      Carregando o vídeo mais recente…
+    </div>
+  `);
+
+  try{
+    const latestId = await getLatestYouTubeVideoId(YT_CHANNEL_ID);
+    openModal("YouTube • Atelier Studios", youtubeEmbedHtmlLatest({ channelId: YT_CHANNEL_ID, videoId: latestId }));
+  } catch(err){
+    console.warn("Falhou pegar último vídeo, usando playlist.", err);
+    openModal("YouTube • Atelier Studios", youtubeEmbedHtmlFallbackPlaylist({ channelId: YT_CHANNEL_ID }));
+  }
+  return;
+}
+
 
       openModal("YouTube • Atelier Studios", `
         <div class="modalFrame">
@@ -1600,9 +1711,50 @@ document.querySelectorAll('.portMedia[data-platform]').forEach((a) => {
   });
 });
 
+    // ===== Swipe down to close (mobile) =====
+(() => {
+  const box = modalOverlay.querySelector(".modalBox");
+  let startY = 0, startX = 0, dragging = false;
+
+  box.addEventListener("touchstart", (e) => {
+    if(!modalOverlay.classList.contains("open")) return;
+    const t = e.touches[0];
+    startY = t.clientY;
+    startX = t.clientX;
+    dragging = true;
+  }, { passive: true });
+
+  box.addEventListener("touchmove", (e) => {
+    if(!dragging) return;
+    const t = e.touches[0];
+    const dy = t.clientY - startY;
+    const dx = Math.abs(t.clientX - startX);
+
+    // só “puxa” se for gesto vertical
+    if(dy > 0 && dx < 40){
+      box.style.transform = `translateY(${Math.min(dy, 140)}px)`;
+      box.style.transition = "none";
+    }
+  }, { passive: true });
+
+  box.addEventListener("touchend", (e) => {
+    if(!dragging) return;
+    dragging = false;
+
+    const endY = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientY : startY;
+    const dy = endY - startY;
+
+    box.style.transition = "transform .16s ease";
+    box.style.transform = "translateY(0px)";
+
+    if(dy > 90) closeModal();
+  }, { passive: true });
+})();
+
   </script>
 </body>
 </html>
+
 
 
 
