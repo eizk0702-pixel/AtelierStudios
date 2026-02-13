@@ -389,16 +389,7 @@
         radial-gradient(160px 120px at 20% 30%, rgba(106,92,255,.20), transparent 65%),
         radial-gradient(140px 120px at 80% 70%, rgba(183,108,255,.14), transparent 65%);
     }
-    .portMedia img{
-      width:132px;
-      height:132px;
-      border-radius:28px;
-      object-fit:cover;
-      border:1px solid rgba(255,255,255,.16);
-      background: rgba(255,255,255,.04);
-      box-shadow: 0 18px 60px rgba(0,0,0,.40);
-      display:block;
-    }
+
     .playBadge{
       position:absolute;
       left:12px;
@@ -411,17 +402,7 @@
       font-size:12px;
       backdrop-filter: blur(10px);
     }
-    .portBody{padding:14px 16px}
-    .portBody b{display:block; margin-bottom:6px; line-height:1.25}
-    .portBody span{color:var(--muted); font-size:13px}
-    .pill{
-      position:absolute; top:12px; left:12px;
-      font-size:12px; padding:6px 10px; border-radius:999px;
-      background: rgba(0,0,0,.28);
-      border: 1px solid var(--line);
-      color: var(--muted);
-      backdrop-filter: blur(10px);
-    }
+
     .portActions{
       padding: 0 16px 16px;
       display:flex;
@@ -559,8 +540,10 @@
       opacity:.85;
     }
 
-    .reveal{opacity:0; transform: translateY(10px); transition: opacity .5s ease, transform .5s ease}
-    .reveal.show{opacity:1; transform: translateY(0)}
+    /* ===== REVEAL (com fallback pra não sumir tudo se JS quebrar) ===== */
+    .reveal{opacity:1; transform:none}
+    .js .reveal{opacity:0; transform: translateY(10px); transition: opacity .5s ease, transform .5s ease}
+    .js .reveal.show{opacity:1; transform: translateY(0)}
 
     @media (prefers-reduced-motion: reduce){
       html{scroll-behavior:auto}
@@ -568,220 +551,176 @@
       .chev{transition:none}
       .btn{transition:none}
     }
+
     /* ===== PORTFÓLIO: HOVER PREMIUM (zoom + brilho + glow no ícone) ===== */
+    .portItem{
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+      will-change: transform;
+    }
+    .portItem:hover{
+      transform: translateY(-3px);
+      border-color: rgba(255,255,255,.16);
+      box-shadow: 0 22px 80px rgba(0,0,0,.55);
+    }
+    .portMedia{
+      transition: transform .18s ease, filter .18s ease;
+      position: relative;
+    }
+    .portItem:hover .portMedia{
+      transform: scale(1.015);
+      filter: brightness(1.06) saturate(1.05);
+    }
+    .portMedia > div{
+      transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease;
+    }
+    .portItem:hover .portMedia div[style*="width:86px"]{
+      box-shadow:
+        0 22px 70px rgba(0,0,0,.55),
+        0 0 0 1px rgba(255,255,255,.12),
+        0 0 40px rgba(106,92,255,.22);
+      border-color: rgba(255,255,255,.22);
+      transform: translateY(-1px);
+    }
+    .portMedia svg{
+      transition: filter .18s ease, transform .18s ease, opacity .18s ease;
+      opacity: .92;
+    }
+    .portItem:hover .portMedia svg{
+      opacity: 1;
+      transform: scale(1.04);
+      filter: drop-shadow(0 0 10px rgba(183,108,255,.35))
+              drop-shadow(0 0 18px rgba(106,92,255,.20));
+    }
+    .portMedia::after{
+      content:"";
+      position:absolute;
+      inset:-20% -40%;
+      background: linear-gradient(120deg,
+        transparent 35%,
+        rgba(255,255,255,.10) 45%,
+        rgba(255,255,255,.06) 55%,
+        transparent 65%
+      );
+      transform: translateX(-35%) rotate(8deg);
+      opacity: 0;
+      transition: opacity .18s ease, transform .45s ease;
+      pointer-events:none;
+    }
+    .portItem:hover .portMedia::after{
+      opacity: .9;
+      transform: translateX(35%) rotate(8deg);
+    }
+    .portItem:hover .btn.small{
+      border-color: rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+    }
+    @media (prefers-reduced-motion: reduce){
+      .portItem, .portMedia, .portMedia::after, .portMedia svg{
+        transition:none !important;
+        transform:none !important;
+        filter:none !important;
+      }
+    }
 
-/* Faz o card “subir” e ficar mais vivo */
-.portItem{
-  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
-  will-change: transform;
-}
+    /* ===== PORTFÓLIO: BOTÃO GRADIENTE NO HOVER ===== */
+    .portActions .btn.small{
+      transition: transform .12s ease, background .12s ease, border-color .12s ease, box-shadow .12s ease, filter .12s ease;
+    }
+    .portItem:hover .portActions .btn.small:first-child{
+      border: none;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 14px 44px rgba(106,92,255,.26);
+      filter: brightness(1.02);
+    }
+    .portItem:hover .portActions .btn.small:first-child:hover{
+      transform: translateY(-1px) scale(1.01);
+    }
 
-.portItem:hover{
-  transform: translateY(-3px);
-  border-color: rgba(255,255,255,.16);
-  box-shadow: 0 22px 80px rgba(0,0,0,.55);
-}
+    /* ===== MODAL ===== */
+    .modalOverlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.70);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      padding: 18px;
+    }
+    .modalOverlay.open{ display:flex; }
 
-/* Deixa a área clicável com leve zoom e brilho */
-.portMedia{
-  transition: transform .18s ease, filter .18s ease;
-  position: relative;
-}
+    .modalBox{
+      width: min(980px, 100%);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.20));
+      box-shadow: 0 30px 120px rgba(0,0,0,.65);
+      overflow: hidden;
+    }
 
-.portItem:hover .portMedia{
-  transform: scale(1.015);
-  filter: brightness(1.06) saturate(1.05);
-}
+    .modalTop{
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding: 22px 16px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .modalTop::before{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:8px;
+      transform: translateX(-50%);
+      width: 46px;
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.14);
+      opacity: .75;
+    }
+    .modalTop b{ font-size:14px; letter-spacing:.02em; }
 
-/* Glow suave na moldura do “ícone” (a caixinha que envolve o SVG) */
-.portMedia > div{
-  transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease;
-}
+    .modalClose{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 8px 10px;
+      cursor:pointer;
+    }
+    .modalClose:hover{ background: rgba(255,255,255,.06); }
 
-/* Como você usa um div wrapper no centro, a gente mira nele */
-.portItem:hover .portMedia div[style*="width:86px"]{
-  box-shadow:
-    0 22px 70px rgba(0,0,0,.55),
-    0 0 0 1px rgba(255,255,255,.12),
-    0 0 40px rgba(106,92,255,.22);
-  border-color: rgba(255,255,255,.22);
-  transform: translateY(-1px);
-}
+    .modalBody{ padding: 16px; }
 
-/* Glow no ícone (SVG) e leve “acender” */
-.portMedia svg{
-  transition: filter .18s ease, transform .18s ease, opacity .18s ease;
-  opacity: .92;
-}
-
-.portItem:hover .portMedia svg{
-  opacity: 1;
-  transform: scale(1.04);
-  filter: drop-shadow(0 0 10px rgba(183,108,255,.35))
-          drop-shadow(0 0 18px rgba(106,92,255,.20));
-}
-
-/* “Shine” passando por cima (aquele reflexo chique) */
-.portMedia::after{
-  content:"";
-  position:absolute;
-  inset:-20% -40%;
-  background: linear-gradient(120deg,
-    transparent 35%,
-    rgba(255,255,255,.10) 45%,
-    rgba(255,255,255,.06) 55%,
-    transparent 65%
-  );
-  transform: translateX(-35%) rotate(8deg);
-  opacity: 0;
-  transition: opacity .18s ease, transform .45s ease;
-  pointer-events:none;
-}
-
-.portItem:hover .portMedia::after{
-  opacity: .9;
-  transform: translateX(35%) rotate(8deg);
-}
-
-/* Botões do portfólio ficarem mais “clicáveis” no hover do card */
-.portItem:hover .btn.small{
-  border-color: rgba(255,255,255,.16);
-  background: rgba(255,255,255,.06);
-}
-
-/* Acessibilidade: sem movimento pra quem pediu */
-@media (prefers-reduced-motion: reduce){
-  .portItem, .portMedia, .portMedia::after, .portMedia svg{
-    transition:none !important;
-    transform:none !important;
-    filter:none !important;
-  }
-}
-
-    /* ===== PORTFÓLIO: TÍTULO GLOW + BOTÃO GRADIENTE NO HOVER ===== */
-
-/* Título e subtítulo “acendem” quando passa o mouse no card */
-.portItem:hover .portMedia b{
-  text-shadow:
-    0 0 14px rgba(106,92,255,.35),
-    0 0 24px rgba(183,108,255,.22);
-}
-
-.portItem:hover .portMedia span{
-  color: rgba(242,243,247,.92);
-}
-
-/* Botões do card: o primeiro vira “principal” com gradiente no hover */
-.portActions .btn.small{
-  transition: transform .12s ease, background .12s ease, border-color .12s ease, box-shadow .12s ease, filter .12s ease;
-}
-
-.portItem:hover .portActions .btn.small:first-child{
-  border: none;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  box-shadow: 0 14px 44px rgba(106,92,255,.26);
-  filter: brightness(1.02);
-}
-
-.portItem:hover .portActions .btn.small:first-child:hover{
-  transform: translateY(-1px) scale(1.01);
-}
-
-/* ===== MODAL (overlay) ===== */
-.modalOverlay{
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.70);
-  backdrop-filter: blur(10px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-  padding: 18px;
-}
-.modalOverlay.open{ display:flex; }
-
-.modalBox{
-  width: min(980px, 100%);
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,.12);
-  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.20));
-  box-shadow: 0 30px 120px rgba(0,0,0,.65);
-  overflow: hidden;
-}
-
-.modalTop{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding: 14px 16px;
-  border-bottom: 1px solid rgba(255,255,255,.08);
-}
-
-.modalTop b{ font-size:14px; letter-spacing:.02em; }
-.modalClose{
-  border:1px solid rgba(255,255,255,.10);
-  background: rgba(255,255,255,.04);
-  color: var(--text);
-  border-radius: 12px;
-  padding: 8px 10px;
-  cursor:pointer;
-}
-.modalClose:hover{ background: rgba(255,255,255,.06); }
-
-.modalBody{
-  padding: 16px;
-}
-
-.modalFrame{
-  width:100%;
-  height: 520px;
-  border: 1px solid rgba(255,255,255,.10);
-  border-radius: 16px;
-  overflow:hidden;
-  background: rgba(0,0,0,.18);
-}
-
-.modalFrame iframe{
-  width:100%;
-  height:100%;
-  border:0;
-  display:block;
-}
-
-.modalActions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top: 14px;
-}
-
-/* Acessibilidade: reduz movimento */
-@media (prefers-reduced-motion: reduce){
-  .modalOverlay{ backdrop-filter:none; }
-}
-
-    /* “handle” de arrastar no modal (visual app-like) */
-.modalTop::before{
-  content:"";
-  position:absolute;
-  left:50%;
-  top:8px;
-  transform: translateX(-50%);
-  width: 46px;
-  height: 5px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.14);
-  opacity: .75;
-}
-.modalTop{ position:relative; padding-top:22px; }
-
-
+    .modalFrame{
+      width:100%;
+      height: 520px;
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 16px;
+      overflow:hidden;
+      background: rgba(0,0,0,.18);
+    }
+    .modalFrame iframe{
+      width:100%;
+      height:100%;
+      border:0;
+      display:block;
+    }
+    .modalActions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 14px;
+    }
+    @media (prefers-reduced-motion: reduce){
+      .modalOverlay{ backdrop-filter:none; }
+    }
   </style>
 </head>
-<body>
 
+<body>
   <a class="skip" href="#conteudo">Pular para o conteúdo</a>
 
   <header class="topbar">
@@ -1001,119 +940,116 @@
       </div>
     </section>
 
-   <!-- PORTFÓLIO (YOUTUBE + INSTAGRAM) -->
-<section class="section" id="portfolio">
-  <div class="wrap">
-    <div class="sectionHead">
-      <div>
-        <h2>Portfólio</h2>
-        <p>Veja nossos canais com trabalhos e novidades.</p>
-      </div>
-    </div>
+    <!-- PORTFÓLIO (YOUTUBE + INSTAGRAM) -->
+    <section class="section" id="portfolio">
+      <div class="wrap">
+        <div class="sectionHead">
+          <div>
+            <h2>Portfólio</h2>
+            <p>Veja nossos canais com trabalhos e novidades.</p>
+          </div>
+        </div>
 
-    <div class="grid" aria-label="Canais do Atelier Studios">
+        <div class="grid" aria-label="Canais do Atelier Studios">
+          <!-- YOUTUBE -->
+          <div class="card portItem reveal" style="grid-column: span 6;">
+            <div class="pill">YouTube</div>
 
-      <!-- YOUTUBE -->
-      <div class="card portItem reveal" style="grid-column: span 6;">
-        <div class="pill">YouTube</div>
+            <a class="portMedia"
+               data-platform="youtube"
+               href="https://www.youtube.com/channel/UCBFPFsLmBOvtn_5SqGkw3mA"
+               target="_blank" rel="noopener"
+               aria-label="Abrir canal no YouTube">
 
-       <a class="portMedia"
-   data-platform="youtube"
-   href="https://www.youtube.com/channel/UCBFPFsLmBOvtn_5SqGkw3mA"
-   target="_blank" rel="noopener">
+              <div style="position:absolute; inset:0; opacity:.16; pointer-events:none;
+                background: radial-gradient(260px 200px at 30% 35%, rgba(255,0,0,.45), transparent 60%);">
+              </div>
 
+              <div style="display:flex; flex-direction:column; align-items:center; gap:12px; text-align:center; padding:16px;">
+                <div style="
+                  width:86px; height:86px; border-radius:24px;
+                  display:grid; place-items:center;
+                  border:1px solid rgba(255,255,255,.16);
+                  background: rgba(0,0,0,.18);
+                  box-shadow: 0 18px 60px rgba(0,0,0,.40);
+                ">
+                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" style="color: var(--text);">
+                    <path d="M21.6 7.2c.2 1.1.2 2.3.2 4.8s0 3.7-.2 4.8c-.2 1.2-.9 2-2 2.2C17.8 19.3 12 19.3 12 19.3s-5.8 0-7.6-.3c-1.1-.2-1.8-1-2-2.2C2.2 15.7 2.2 14.5 2.2 12s0-3.7.2-4.8c.2-1.2.9-2 2-2.2C6.2 4.7 12 4.7 12 4.7s5.8 0 7.6.3c1.1.2 1.8 1 2 2.2Z" fill="rgba(255,255,255,.12)"/>
+                    <path d="M10 15.2V8.8L16 12l-6 3.2Z" fill="currentColor"/>
+                  </svg>
+                </div>
 
-          <div style="position:absolute; inset:0; opacity:.16; pointer-events:none;
-            background: radial-gradient(260px 200px at 30% 35%, rgba(255,0,0,.45), transparent 60%);">
+                <b style="font-size:16px;">Atelier Studios</b>
+                <span style="color:var(--muted); font-size:13px;">Canal no YouTube</span>
+
+                <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:8px;">
+                  <span class="tag">+120 entregas</span>
+                  <span class="tag">24–72h</span>
+                  <span class="tag">Reels/Shorts</span>
+                </div>
+              </div>
+
+              <span class="playBadge">▶ Abrir canal</span>
+            </a>
+
+            <div class="portActions">
+              <a class="btn small" href="https://www.youtube.com/channel/UCBFPFsLmBOvtn_5SqGkw3mA" target="_blank" rel="noopener">Ver canal</a>
+              <a class="btn small" href="#contato">Pedir orçamento</a>
+            </div>
           </div>
 
-          <div style="display:flex; flex-direction:column; align-items:center; gap:12px;">
-            <div style="
-              width:86px; height:86px; border-radius:24px;
-              display:grid; place-items:center;
-              border:1px solid rgba(255,255,255,.16);
-              background: rgba(0,0,0,.18);
-              box-shadow: 0 18px 60px rgba(0,0,0,.40);
-            ">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
-                <path d="M21.6 7.2c.2 1.1.2 2.3.2 4.8s0 3.7-.2 4.8c-.2 1.2-.9 2-2 2.2C17.8 19.3 12 19.3 12 19.3s-5.8 0-7.6-.3c-1.1-.2-1.8-1-2-2.2C2.2 15.7 2.2 14.5 2.2 12s0-3.7.2-4.8c.2-1.2.9-2 2-2.2C6.2 4.7 12 4.7 12 4.7s5.8 0 7.6.3c1.1.2 1.8 1 2 2.2Z" fill="rgba(255,255,255,.12)"/>
-                <path d="M10 15.2V8.8L16 12l-6 3.2Z" fill="currentColor"/>
-              </svg>
+          <!-- INSTAGRAM -->
+          <div class="card portItem reveal" style="grid-column: span 6;">
+            <div class="pill">Instagram</div>
+
+            <a class="portMedia"
+               data-platform="instagram"
+               href="https://instagram.com/atelier_studios_"
+               target="_blank" rel="noopener"
+               aria-label="Abrir Instagram do Atelier Studios">
+
+              <div style="position:absolute; inset:0; opacity:.18; pointer-events:none;
+                background:
+                  radial-gradient(280px 220px at 30% 35%, rgba(255,204,102,.40), transparent 60%),
+                  radial-gradient(240px 210px at 70% 70%, rgba(183,108,255,.35), transparent 65%);
+              "></div>
+
+              <div style="display:flex; flex-direction:column; align-items:center; gap:12px; text-align:center; padding:16px;">
+                <div style="
+                  width:86px; height:86px; border-radius:24px;
+                  display:grid; place-items:center;
+                  border:1px solid rgba(255,255,255,.16);
+                  background: rgba(0,0,0,.18);
+                  box-shadow: 0 18px 60px rgba(0,0,0,.40);
+                ">
+                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" style="color: var(--text);">
+                    <path d="M7.5 2.5h9A5 5 0 0 1 21.5 7.5v9a5 5 0 0 1-5 5h-9a5 5 0 0 1-5-5v-9a5 5 0 0 1 5-5Z" stroke="currentColor" stroke-width="1.7"/>
+                    <path d="M12 16.2a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Z" stroke="currentColor" stroke-width="1.7"/>
+                    <path d="M17.4 6.6h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                  </svg>
+                </div>
+
+                <b style="font-size:16px;">@atelier_studios_</b>
+                <span style="color:var(--muted); font-size:13px;">Perfil no Instagram</span>
+
+                <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:8px;">
+                  <span class="tag">Artes & thumbs</span>
+                  <span class="tag">Identidade</span>
+                  <span class="tag">Consistência</span>
+                </div>
+              </div>
+
+              <span class="playBadge">▶ Abrir Instagram</span>
+            </a>
+
+            <div class="portActions">
+              <a class="btn small" href="https://instagram.com/atelier_studios_" target="_blank" rel="noopener">Ver perfil</a>
+              <a class="btn small" href="#contato">Pedir orçamento</a>
             </div>
-
-            <b>Atelier Studios</b>
-<span style="color:var(--muted); font-size:13px;">Canal no YouTube</span>
-
-<div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:10px;">
-  <span class="tag">+120 entregas</span>
-  <span class="tag">24–72h</span>
-  <span class="tag">Reels/Shorts</span>
-</div>
-
-
-          <span class="playBadge">▶ Abrir canal</span>
-        </a>
-
-        <div class="portActions">
-          <a class="btn small" href="https://www.youtube.com/channel/UCBFPFsLmBOvtn_5SqGkw3mA" target="_blank">Ver canal</a>
-          <a class="btn small" href="#contato">Pedir orçamento</a>
-        </div>
-      </div>
-
-      <!-- INSTAGRAM -->
-      <div class="card portItem reveal" style="grid-column: span 6;">
-        <div class="pill">Instagram</div>
-
-       <a class="portMedia"
-   data-platform="instagram"
-   href="https://instagram.com/atelier_studios_"
-   target="_blank" rel="noopener">
-
-
-          <div style="position:absolute; inset:0; opacity:.18; pointer-events:none;
-            background:
-              radial-gradient(280px 220px at 30% 35%, rgba(255,204,102,.40), transparent 60%),
-              radial-gradient(240px 210px at 70% 70%, rgba(183,108,255,.35), transparent 65%);
-          ">
           </div>
-
-          <div style="display:flex; flex-direction:column; align-items:center; gap:12px;">
-            <div style="
-              width:86px; height:86px; border-radius:24px;
-              display:grid; place-items:center;
-              border:1px solid rgba(255,255,255,.16);
-              background: rgba(0,0,0,.18);
-              box-shadow: 0 18px 60px rgba(0,0,0,.40);
-            ">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
-                <path d="M7.5 2.5h9A5 5 0 0 1 21.5 7.5v9a5 5 0 0 1-5 5h-9a5 5 0 0 1-5-5v-9a5 5 0 0 1 5-5Z" stroke="currentColor" stroke-width="1.7"/>
-                <path d="M12 16.2a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Z" stroke="currentColor" stroke-width="1.7"/>
-                <path d="M17.4 6.6h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-              </svg>
-            </div>
-
-            <b>@atelier_studios_</b>
-<span style="color:var(--muted); font-size:13px;">Perfil no Instagram</span>
-
-<div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:10px;">
-  <span class="tag">Artes & thumbs</span>
-  <span class="tag">Identidade</span>
-  <span class="tag">Consistência</span>
-</div>
-
-
-          <span class="playBadge">▶ Abrir Instagram</span>
-        </a>
-
-        <div class="portActions">
-          <a class="btn small" href="https://instagram.com/atelier_studios_" target="_blank">Ver perfil</a>
-          <a class="btn small" href="#contato">Pedir orçamento</a>
         </div>
       </div>
-
-    </div>
-  </div>
-</section>
+    </section>
 
     <!-- PRICING -->
     <section class="section" id="pacotes">
@@ -1332,8 +1268,17 @@
             <div style="margin-top:16px; padding:14px; border-radius:16px; border:1px solid var(--line); background:rgba(0,0,0,.20); color:var(--muted); font-size:13px;">
               <b style="color:var(--text)">Links</b>
               <div style="margin-top:10px; display:grid; gap:8px;">
-                <div>   Instagram:   <a href="https://instagram.com/atelier_studios_" target="_blank" rel="noopener" style="opacity:.9; text-decoration:underline;">     @atelier_studios_   </a> </div>
-                <div>YouTube: <a id="ytLink" href="https://www.youtube.com/channel/UCBFPFsLmBOvtn_5SqGkw3mA" target="_blank" rel="noopener" style="opacity:.9; text-decoration:underline;">Atelier Studios</a></div>
+                <div>
+                  Instagram:
+                  <a href="https://instagram.com/atelier_studios_" target="_blank" rel="noopener" style="opacity:.9; text-decoration:underline;">
+                    @atelier_studios_
+                  </a>
+                </div>
+                <div>YouTube:
+                  <a id="ytLink" href="https://www.youtube.com/channel/UCBFPFsLmBOvtn_5SqGkw3mA" target="_blank" rel="noopener" style="opacity:.9; text-decoration:underline;">
+                    Atelier Studios
+                  </a>
+                </div>
               </div>
             </div>
 
@@ -1362,26 +1307,22 @@
   </div>
 
   <!-- MODAL (preview sem sair do site) -->
-<div class="modalOverlay" id="modalOverlay" aria-hidden="true">
-  <div class="modalBox" role="dialog" aria-modal="true" aria-label="Prévia do portfólio">
-    <div class="modalTop">
-      <b id="modalTitle">Prévia</b>
-      <button class="modalClose" id="modalCloseBtn" type="button">✕ Fechar</button>
-    </div>
-
-    <div class="modalBody" id="modalBody">
-      <!-- preenchido via JS -->
+  <div class="modalOverlay" id="modalOverlay" aria-hidden="true">
+    <div class="modalBox" role="dialog" aria-modal="true" aria-label="Prévia do portfólio">
+      <div class="modalTop">
+        <b id="modalTitle">Prévia</b>
+        <button class="modalClose" id="modalCloseBtn" type="button">✕ Fechar</button>
+      </div>
+      <div class="modalBody" id="modalBody"></div>
     </div>
   </div>
-</div>
-
 
   <script>
-    // ====== CONFIGURE HERE ======
-    // WhatsApp Atelier Studios: +55 11 95875-4234
-    const WHATSAPP_NUMBER = "5511958754234";
+    // Ativa o modo JS (pra animação reveal). Se o JS quebrar, o site ainda aparece (fallback).
+    document.documentElement.classList.add("js");
 
-    // YouTube (canal)
+    // ====== CONFIGURE HERE ======
+    const WHATSAPP_NUMBER = "5511958754234";
     const YT_CHANNEL_URL = "https://www.youtube.com/channel/UCBFPFsLmBOvtn_5SqGkw3mA";
     // ============================
 
@@ -1522,135 +1463,59 @@
       revealEls.forEach(el => el.classList.add("show"));
     }
 
+    // ===== YouTube latest video (RSS feed via proxy) =====
     async function getLatestYouTubeVideoId(channelId){
-  const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
-  const proxied = `https://r.jina.ai/${feedUrl.replace(/^https?:\/\//,'https://')}`;
+      const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+      const proxied = `https://r.jina.ai/${feedUrl.replace(/^https?:\/\//,'https://')}`;
 
-  const res = await fetch(proxied, { cache: "no-store" });
-  if(!res.ok) throw new Error("feed http " + res.status);
+      const res = await fetch(proxied, { cache: "no-store" });
+      if(!res.ok) throw new Error("feed http " + res.status);
 
-  const text = await res.text();
-  const xml = new DOMParser().parseFromString(text, "application/xml");
-  if(xml.getElementsByTagName("parsererror").length) throw new Error("parsererror");
+      const text = await res.text();
+      const xml = new DOMParser().parseFromString(text, "application/xml");
+      if(xml.getElementsByTagName("parsererror").length) throw new Error("parsererror");
 
-  const entry = xml.getElementsByTagName("entry")[0];
-  if(!entry) throw new Error("no entry");
+      const entry = xml.getElementsByTagName("entry")[0];
+      if(!entry) throw new Error("no entry");
 
-  const vidNode =
-    entry.getElementsByTagName("yt:videoId")[0] ||
-    entry.getElementsByTagNameNS("*","videoId")[0];
+      const vidNode =
+        entry.getElementsByTagName("yt:videoId")[0] ||
+        entry.getElementsByTagNameNS("*","videoId")[0];
 
-  const videoId = vidNode?.textContent?.trim();
-  if(!videoId) throw new Error("no videoId");
+      const videoId = vidNode?.textContent?.trim();
+      if(!videoId) throw new Error("no videoId");
 
-  return videoId;
-}
+      return videoId;
+    }
 
-function youtubeEmbedHtmlLatest({ channelId, videoId }){
-  const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
-  const iframeSrc = `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`;
+    function youtubeEmbedHtmlLatest({ channelId, videoId }){
+      const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+      const iframeSrc = `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`;
 
-  return `
-    <div class="modalFrame">
-      <iframe
-        title="Último vídeo do canal"
-        src="${iframeSrc}"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowfullscreen
-        referrerpolicy="strict-origin-when-cross-origin"
-      ></iframe>
-    </div>
+      return `
+        <div class="modalFrame">
+          <iframe
+            title="Último vídeo do canal"
+            src="${iframeSrc}"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+            referrerpolicy="strict-origin-when-cross-origin"
+          ></iframe>
+        </div>
 
-    <div class="modalActions">
-      <a class="btn primary" href="${videoUrl}" target="_blank" rel="noopener">Abrir no YouTube</a>
-      <a class="btn" href="https://www.youtube.com/channel/${channelId}" target="_blank" rel="noopener">Ver canal</a>
-      <a class="btn" href="#contato" onclick="closeModal()">Pedir orçamento</a>
-    </div>
-  `;
-}
+        <div class="modalActions">
+          <a class="btn primary" href="${videoUrl}" target="_blank" rel="noopener">Abrir no YouTube</a>
+          <a class="btn" href="https://www.youtube.com/channel/${channelId}" target="_blank" rel="noopener">Ver canal</a>
+          <a class="btn" href="#contato" onclick="closeModal()">Pedir orçamento</a>
+        </div>
+      `;
+    }
 
-function youtubeEmbedHtmlFallbackPlaylist({ channelId }){
-  const uploadsPlaylist = "UU" + channelId.slice(2);
-  const iframeSrc = `https://www.youtube-nocookie.com/embed/videoseries?list=${uploadsPlaylist}`;
+    function youtubeEmbedHtmlFallbackPlaylist({ channelId }){
+      const uploadsPlaylist = "UU" + channelId.slice(2);
+      const iframeSrc = `https://www.youtube-nocookie.com/embed/videoseries?list=${uploadsPlaylist}`;
 
-  return `
-    <div class="modalFrame">
-      <iframe
-        title="Uploads do canal no YouTube"
-        src="${iframeSrc}"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowfullscreen
-        referrerpolicy="strict-origin-when-cross-origin"
-      ></iframe>
-    </div>
-
-    <div class="modalActions">
-      <a class="btn primary" href="https://www.youtube.com/channel/${channelId}" target="_blank" rel="noopener">Abrir no YouTube</a>
-      <a class="btn" href="#contato" onclick="closeModal()">Pedir orçamento</a>
-    </div>
-  `;
-}
-
-    
-    // ===== MODAL PORTFÓLIO (sem sair do site) =====
-const YT_CHANNEL_ID = "UCBFPFsLmBOvtn_5SqGkw3mA";
-
-const modalOverlay = document.getElementById("modalOverlay");
-const modalCloseBtn = document.getElementById("modalCloseBtn");
-const modalTitle = document.getElementById("modalTitle");
-const modalBody = document.getElementById("modalBody");
-
-function openModal(title, bodyHtml){
-  modalTitle.textContent = title;
-  modalBody.innerHTML = bodyHtml;
-  modalOverlay.classList.add("open");
-  modalOverlay.setAttribute("aria-hidden", "false");
-}
-
-function closeModal(){
-  modalOverlay.classList.remove("open");
-  modalOverlay.setAttribute("aria-hidden", "true");
-  modalBody.innerHTML = "";
-}
-
-modalCloseBtn.addEventListener("click", closeModal);
-
-// fecha clicando fora da caixa
-modalOverlay.addEventListener("click", (e) => {
-  const box = modalOverlay.querySelector(".modalBox");
-  if(!box.contains(e.target)) closeModal();
-});
-
-// fecha no ESC
-document.addEventListener("keydown", (e) => {
-  if(e.key === "Escape" && modalOverlay.classList.contains("open")) closeModal();
-});
-
-// Intercepta clique nos cards do portfólio
-document.querySelectorAll('.portMedia[data-platform]').forEach((a) => {
-  a.addEventListener("click", (e) => {
-    e.preventDefault(); // não abre em aba nova, abre modal
-    const platform = a.getAttribute("data-platform");
-
-    if(platform === "youtube"){
-  openModal("YouTube • Atelier Studios", `
-    <div style="color:var(--muted); font-size:13px; margin-bottom:10px;">
-      Carregando o vídeo mais recente…
-    </div>
-  `);
-
-  try{
-    const latestId = await getLatestYouTubeVideoId(YT_CHANNEL_ID);
-    openModal("YouTube • Atelier Studios", youtubeEmbedHtmlLatest({ channelId: YT_CHANNEL_ID, videoId: latestId }));
-  } catch(err){
-    console.warn("Falhou pegar último vídeo, usando playlist.", err);
-    openModal("YouTube • Atelier Studios", youtubeEmbedHtmlFallbackPlaylist({ channelId: YT_CHANNEL_ID }));
-  }
-  return;
-}
-
-
-      openModal("YouTube • Atelier Studios", `
+      return `
         <div class="modalFrame">
           <iframe
             title="Uploads do canal no YouTube"
@@ -1662,100 +1527,155 @@ document.querySelectorAll('.portMedia[data-platform]').forEach((a) => {
         </div>
 
         <div class="modalActions">
-          <a class="btn primary" href="https://www.youtube.com/channel/${YT_CHANNEL_ID}" target="_blank" rel="noopener">Abrir no YouTube</a>
+          <a class="btn primary" href="https://www.youtube.com/channel/${channelId}" target="_blank" rel="noopener">Abrir no YouTube</a>
           <a class="btn" href="#contato" onclick="closeModal()">Pedir orçamento</a>
         </div>
-      `);
-      return;
+      `;
     }
 
-    if(platform === "instagram"){
-      // Instagram costuma bloquear iframe de perfil. Preview bonito + botão.
-      openModal("Instagram • @atelier_studios_", `
-        <div style="border:1px solid rgba(255,255,255,.10); border-radius:16px; padding:16px; background:rgba(0,0,0,.18);">
-          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-            <div style="
-              width:64px; height:64px; border-radius:18px;
-              display:grid; place-items:center;
-              border:1px solid rgba(255,255,255,.14);
-              background: linear-gradient(135deg, rgba(255,204,102,.20), rgba(183,108,255,.18), rgba(106,92,255,.18));
-              box-shadow: 0 18px 60px rgba(0,0,0,.45);
-            ">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="color: var(--text); opacity:.95;">
-                <path d="M7.5 2.5h9A5 5 0 0 1 21.5 7.5v9a5 5 0 0 1-5 5h-9a5 5 0 0 1-5-5v-9a5 5 0 0 1 5-5Z" stroke="currentColor" stroke-width="1.7"/>
-                <path d="M12 16.2a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Z" stroke="currentColor" stroke-width="1.7"/>
-                <path d="M17.4 6.6h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-              </svg>
-            </div>
+    // ===== MODAL PORTFÓLIO (sem sair do site) =====
+    const YT_CHANNEL_ID = "UCBFPFsLmBOvtn_5SqGkw3mA";
 
-            <div>
-              <b style="display:block; font-size:16px;">@atelier_studios_</b>
-              <span style="display:block; color:var(--muted); font-size:13px; margin-top:4px;">
-                Portfólio e novidades no Instagram
-              </span>
-            </div>
-          </div>
+    const modalOverlay = document.getElementById("modalOverlay");
+    const modalCloseBtn = document.getElementById("modalCloseBtn");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalBody = document.getElementById("modalBody");
 
-          <div style="margin-top:14px; color:var(--muted); font-size:13px;">
-            (Prévia interna: o Instagram costuma bloquear embed do perfil. Clique em “Abrir no Instagram” pra ver tudo.)
-          </div>
-        </div>
-
-        <div class="modalActions">
-          <a class="btn primary" href="https://instagram.com/atelier_studios_" target="_blank" rel="noopener">Abrir no Instagram</a>
-          <a class="btn" href="#contato" onclick="closeModal()">Pedir orçamento</a>
-        </div>
-      `);
-      return;
+    function openModal(title, bodyHtml){
+      modalTitle.textContent = title;
+      modalBody.innerHTML = bodyHtml;
+      modalOverlay.classList.add("open");
+      modalOverlay.setAttribute("aria-hidden", "false");
     }
-  });
-});
+
+    function closeModal(){
+      modalOverlay.classList.remove("open");
+      modalOverlay.setAttribute("aria-hidden", "true");
+      modalBody.innerHTML = "";
+    }
+
+    modalCloseBtn.addEventListener("click", closeModal);
+
+    // fecha clicando fora da caixa
+    modalOverlay.addEventListener("click", (e) => {
+      const box = modalOverlay.querySelector(".modalBox");
+      if(!box.contains(e.target)) closeModal();
+    });
+
+    // fecha no ESC
+    document.addEventListener("keydown", (e) => {
+      if(e.key === "Escape" && modalOverlay.classList.contains("open")) closeModal();
+    });
+
+    // Intercepta clique nos cards do portfólio
+    document.querySelectorAll('.portMedia[data-platform]').forEach((a) => {
+      a.addEventListener("click", async (e) => {
+        e.preventDefault();
+
+        const platform = a.getAttribute("data-platform");
+
+        if(platform === "youtube"){
+          openModal("YouTube • Atelier Studios", `
+            <div style="color:var(--muted); font-size:13px; margin-bottom:10px;">
+              Carregando o vídeo mais recente…
+            </div>
+          `);
+
+          try{
+            const latestId = await getLatestYouTubeVideoId(YT_CHANNEL_ID);
+            openModal(
+              "YouTube • Atelier Studios",
+              youtubeEmbedHtmlLatest({ channelId: YT_CHANNEL_ID, videoId: latestId })
+            );
+          } catch(err){
+            console.warn("Falhou pegar último vídeo, usando playlist.", err);
+            openModal(
+              "YouTube • Atelier Studios",
+              youtubeEmbedHtmlFallbackPlaylist({ channelId: YT_CHANNEL_ID })
+            );
+          }
+          return;
+        }
+
+        if(platform === "instagram"){
+          openModal("Instagram • @atelier_studios_", `
+            <div style="border:1px solid rgba(255,255,255,.10); border-radius:16px; padding:16px; background:rgba(0,0,0,.18);">
+              <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                <div style="
+                  width:64px; height:64px; border-radius:18px;
+                  display:grid; place-items:center;
+                  border:1px solid rgba(255,255,255,.14);
+                  background: linear-gradient(135deg, rgba(255,204,102,.20), rgba(183,108,255,.18), rgba(106,92,255,.18));
+                  box-shadow: 0 18px 60px rgba(0,0,0,.45);
+                ">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="color: var(--text); opacity:.95;">
+                    <path d="M7.5 2.5h9A5 5 0 0 1 21.5 7.5v9a5 5 0 0 1-5 5h-9a5 5 0 0 1-5-5v-9a5 5 0 0 1 5-5Z" stroke="currentColor" stroke-width="1.7"/>
+                    <path d="M12 16.2a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Z" stroke="currentColor" stroke-width="1.7"/>
+                    <path d="M17.4 6.6h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                  </svg>
+                </div>
+
+                <div>
+                  <b style="display:block; font-size:16px;">@atelier_studios_</b>
+                  <span style="display:block; color:var(--muted); font-size:13px; margin-top:4px;">
+                    Portfólio e novidades no Instagram
+                  </span>
+                </div>
+              </div>
+
+              <div style="margin-top:14px; color:var(--muted); font-size:13px;">
+                (O Instagram costuma bloquear embed do perfil. Clique em “Abrir no Instagram” pra ver tudo.)
+              </div>
+            </div>
+
+            <div class="modalActions">
+              <a class="btn primary" href="https://instagram.com/atelier_studios_" target="_blank" rel="noopener">Abrir no Instagram</a>
+              <a class="btn" href="#contato" onclick="closeModal()">Pedir orçamento</a>
+            </div>
+          `);
+          return;
+        }
+      });
+    });
 
     // ===== Swipe down to close (mobile) =====
-(() => {
-  const box = modalOverlay.querySelector(".modalBox");
-  let startY = 0, startX = 0, dragging = false;
+    (() => {
+      const box = modalOverlay.querySelector(".modalBox");
+      let startY = 0, startX = 0, dragging = false;
 
-  box.addEventListener("touchstart", (e) => {
-    if(!modalOverlay.classList.contains("open")) return;
-    const t = e.touches[0];
-    startY = t.clientY;
-    startX = t.clientX;
-    dragging = true;
-  }, { passive: true });
+      box.addEventListener("touchstart", (e) => {
+        if(!modalOverlay.classList.contains("open")) return;
+        const t = e.touches[0];
+        startY = t.clientY;
+        startX = t.clientX;
+        dragging = true;
+      }, { passive: true });
 
-  box.addEventListener("touchmove", (e) => {
-    if(!dragging) return;
-    const t = e.touches[0];
-    const dy = t.clientY - startY;
-    const dx = Math.abs(t.clientX - startX);
+      box.addEventListener("touchmove", (e) => {
+        if(!dragging) return;
+        const t = e.touches[0];
+        const dy = t.clientY - startY;
+        const dx = Math.abs(t.clientX - startX);
 
-    // só “puxa” se for gesto vertical
-    if(dy > 0 && dx < 40){
-      box.style.transform = `translateY(${Math.min(dy, 140)}px)`;
-      box.style.transition = "none";
-    }
-  }, { passive: true });
+        if(dy > 0 && dx < 40){
+          box.style.transform = `translateY(${Math.min(dy, 140)}px)`;
+          box.style.transition = "none";
+        }
+      }, { passive: true });
 
-  box.addEventListener("touchend", (e) => {
-    if(!dragging) return;
-    dragging = false;
+      box.addEventListener("touchend", (e) => {
+        if(!dragging) return;
+        dragging = false;
 
-    const endY = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientY : startY;
-    const dy = endY - startY;
+        const endY = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientY : startY;
+        const dy = endY - startY;
 
-    box.style.transition = "transform .16s ease";
-    box.style.transform = "translateY(0px)";
+        box.style.transition = "transform .16s ease";
+        box.style.transform = "translateY(0px)";
 
-    if(dy > 90) closeModal();
-  }, { passive: true });
-})();
-
+        if(dy > 90) closeModal();
+      }, { passive: true });
+    })();
   </script>
 </body>
 </html>
-
-
-
-
-
